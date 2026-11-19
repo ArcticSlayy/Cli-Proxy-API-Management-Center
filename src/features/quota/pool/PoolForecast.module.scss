@@ -1,0 +1,258 @@
+/* Pool forecast: one row per provider, aggregated from the quota cards. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-primary) 55%, transparent);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.headCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.windowSwitch {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-full;
+  background: var(--bg-secondary);
+}
+
+.windowButton,
+.windowActive {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: $radius-full;
+  background: transparent;
+  font-family: $font-mono;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.windowActive {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+
+.emailsToggle {
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-full;
+  background: transparent;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+  }
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 0;
+
+  & + & {
+    border-top: 1px dashed var(--border-color);
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.provider {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.accounts {
+  font-family: $font-mono;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.poolFigure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: auto;
+
+  strong {
+    font-family: $font-mono;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 860px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statLabel {
+  font-family: $font-mono;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.statValue {
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spark {
+  width: 168px;
+  height: 34px;
+  align-self: flex-start;
+}
+
+.sparkPlaceholder {
+  width: 168px;
+  height: 34px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.sparkRecorded {
+  stroke: var(--viz-success, var(--success-color));
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkProjected {
+  stroke: var(--text-tertiary);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.sparkDot {
+  fill: var(--viz-success, var(--success-color));
+}
+
+.sparkBaseline {
+  stroke: var(--viz-success, var(--success-color));
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+.accountList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accountItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-full;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.accountName {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountLimit {
+  font-family: $font-mono;
+  color: var(--text-primary);
+}

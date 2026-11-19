@@ -22,11 +22,21 @@ Last updated: 2026-11-19
 
 | Area | What changed | Why |
 | --- | --- | --- |
+| Quota page: **Pool forecast** | New panel above the cards: per provider, the pool (`remaining% of capacity%`), burn rate from recorded samples, next reset, first-empty projection, a recorded/projected sparkline, and per-account chips with a "Show emails" privacy toggle | The cards answer "what is left on this account"; nothing answered "what do I have left across the provider, and when does it run out" |
+| Quota page: **auto-load** | First visit in a browser session fetches quota once (sessionStorage guard + ref), so cards and the pool are populated instead of six "Click here to refresh quota" placeholders | The page opened at "0 loaded"; every provider needed a manual click |
+| `pool/poolModel.ts` | Pure extraction from the five quota shapes (longest window per account, tightest Antigravity bucket, xAI billing), pool totals, burn from samples, projection, label masking | Testable without React; no guessed numbers - no samples means no burn rate |
+| `pool/PoolForecast.tsx` + module | Panel, window switch (1h/3h/6h), sample persistence in localStorage, SVG sparkline | Follows the existing token/SCSS-module conventions |
 | Dashboard hero | "What needs attention" list: provider, account, unwrapped upstream reason, cooldown remainder, link to Auth Files | The verdict said *Needs attention* but itemised nothing; the failures (quota, rate limit) were only discoverable by opening Auth Files |
 | `useDashboardOverview` | Derives `attention[]` from disabled/unavailable credentials, sorts unavailable first then soonest cooldown, records the snapshot receipt time so render stays pure | Keeps `react-hooks/purity` satisfied and the cooldown math honest |
 | `utils.summarizeCredentialReason` | Unwraps `{error:{message}}` JSON envelopes into one line, collapses whitespace, truncates at 120 chars | Rows showed raw 400-char JSON blobs before |
-| i18n | 8 keys × 7 locales | Locale parity tests require every bundle to carry every key |
-| Tests | `tests/dashboardAttention.test.ts` (5 cases: source contracts, reason unwrapping, locale coverage) | Matches the repo's source-contract + pure-helper test style |
+| i18n | 8 + 17 keys × 7 locales | Locale parity tests require every bundle to carry every key |
+| Tests | `tests/dashboardAttention.test.ts` (5 cases), `tests/quotaPoolForecast.test.ts` (10 cases) | Matches the repo's source-contract + pure-helper test style |
+
+### Pool forecast: not yet covered
+
+Compared with the reference design (pool chart with multi-day range, drain/burn modes, future-usage presets,
+per-pool account selector): those remain open. Today the panel has one window switch, one projection basis
+(recorded burn), and no date range.
 
 ## Merged upstream fixes (2026-11-19)
 

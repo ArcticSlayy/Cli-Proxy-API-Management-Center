@@ -28,6 +28,7 @@ import { getQuotaCacheKey } from '@/utils/quota/identity';
 import { ProviderTabs } from '@/features/authFiles/components/ProviderTabs';
 import { QuotaHeader } from './components/QuotaHeader';
 import { QuotaCard } from './components/QuotaCard';
+import { PoolForecast } from './pool/PoolForecast';
 import { QuotaTimeline } from './components/QuotaTimeline';
 import {
   CARD_ENTRANCE_BUDGET_MS,
@@ -64,6 +65,7 @@ import { readQuotaUiState, writeQuotaUiState } from './uiState';
 import styles from './QuotaPage.module.scss';
 
 const TAB_IDS: string[] = ['all', ...QUOTA_TAB_ORDER];
+const QUOTA_AUTOLOAD_KEY = 'cpa.quota.autoloaded.v1';
 const SKELETON_CARD_COUNT = 6;
 
 /**
@@ -323,6 +325,27 @@ export function QuotaPage() {
     }
   }, [disableControls, error, filesGeneration, loading, loadQuota, pageItems, sessionGeneration]);
 
+  /**
+   * First visit in a browser session: pull quota once so the cards and the pool
+   * forecast have data instead of six "Click here to refresh quota" panels.
+   * Guarded by sessionStorage + a ref so a reload does not hammer the upstream
+   * quota endpoints, and skipped whenever anything is already loading.
+   */
+  const autoLoadedRef = useRef(false);
+  useEffect(() => {
+    if (autoLoadedRef.current) return;
+    if (disableControls || loading || batchLoading || error) return;
+    if (entries.length === 0 || loadedCount > 0) return;
+    try {
+      if (sessionStorage.getItem(QUOTA_AUTOLOAD_KEY) === '1') return;
+      sessionStorage.setItem(QUOTA_AUTOLOAD_KEY, '1');
+    } catch {
+      // Storage blocked: the ref below still keeps this to once per mount.
+    }
+    autoLoadedRef.current = true;
+    void loadQuota(entries);
+  }, [batchLoading, disableControls, entries, error, loadQuota, loadedCount, loading]);
+
   useDevinQuotaAutoLoad(
     pageItems,
     disableControls ||
@@ -392,6 +415,8 @@ export function QuotaPage() {
         disableControls={disableControls}
         onRefreshAll={handleRefreshAll}
       />
+
+      <PoolForecast files={files} />
 
       <section className={styles.workbench}>
         {/* 提供商导航与搜索工具栏分层，避免不同控件争夺视觉焦点。 */}
