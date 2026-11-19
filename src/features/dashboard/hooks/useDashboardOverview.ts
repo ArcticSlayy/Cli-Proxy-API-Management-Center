@@ -10,13 +10,16 @@ import {
 } from '@/utils/recentRequests';
 import type { Config } from '@/types';
 import type { AuthFileItem } from '@/types/authFile';
+import { deriveAuthFileIdentity } from '@/features/authFiles/identity';
 import {
   TRAFFIC_BUCKET_MINUTES,
+  type CredentialAttention,
   type CredentialHealth,
   type DashboardCounts,
   type ProviderTraffic,
   type TrafficWindow,
 } from '../types';
+import { summarizeCredentialReason } from '../utils';
 
 const EMPTY_TRAFFIC: TrafficWindow = {
   buckets: [],
@@ -128,12 +131,15 @@ export function useDashboardOverview() {
   });
 
   const [authFiles, setAuthFiles] = useState<AuthFileItem[] | null>(null);
+  /** Receipt time of the current authFiles snapshot; keeps cooldown math pure in render. */
+  const [authFilesAtMs, setAuthFilesAtMs] = useState(0);
 
   const loadAuthFiles = useCallback(async () => {
     if (!connected) return;
     try {
       const response = await authFilesApi.list();
       setAuthFiles(response.files);
+      setAuthFilesAtMs(Date.now());
     } catch {
       setAuthFiles(null);
     }
@@ -270,6 +276,40 @@ export function useDashboardOverview() {
     };
   }, [authFiles]);
 
+  /**
+   * The verdict on the dashboard says "Needs attention" - this is the list of
+   * what actually needs it, so the headline is actionable instead of decorative.
+   * Priority: unavailable credentials before operator-disabled ones, then by
+   * the soonest cooldown.
+   */
+  const attention = useMemo<CredentialAttention[]>(() => {
+    if (!authFiles) return [];
+
+    return authFiles
+      .filter((file) => file.disabled || file.unavailable)
+      .map((file): CredentialAttention => {
+        const cooldown =
+          file.cooldownSnapshot?.records?.find((record) => record.remainingSeconds > 0) ?? null;
+        const reason =
+          summarizeCredentialReason(file.statusMessage) ?? summarizeCredentialReason(cooldown?.reason);
+        return {
+          name: file.name,
+          label: deriveAuthFileIdentity(file).primary,
+          provider: providerIdOfAuthFile(file),
+          disabled: Boolean(file.disabled),
+          reason,
+          retryAtMs: cooldown ? authFilesAtMs + cooldown.remainingSeconds * 1000 : null,
+        };
+      })
+      .sort((a, b) => {
+        if (a.disabled !== b.disabled) return a.disabled ? 1 : -1;
+        const retryA = a.retryAtMs ?? Number.POSITIVE_INFINITY;
+        const retryB = b.retryAtMs ?? Number.POSITIVE_INFINITY;
+        if (retryA !== retryB) return retryA - retryB;
+        return a.label.localeCompare(b.label);
+      });
+  }, [authFiles, authFilesAtMs]);
+
   const counts = useMemo<DashboardCounts>(
     () => ({
       managementKeys: config ? (config.apiKeys?.length ?? 0) : null,
@@ -291,6 +331,7 @@ export function useDashboardOverview() {
     traffic,
     providers,
     credentials,
+    attention,
     refresh,
   };
 }

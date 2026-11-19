@@ -135,6 +135,14 @@
     "system_info": "Çalışma Zamanı ve Tanılama"
   },
   "dashboard": {
+    "attention_heading": "İlgi gerekiyor",
+    "attention_more": "Tüm kimlik bilgileri",
+    "attention_paused": "Duraklatıldı",
+    "attention_no_reason": "Sebep bildirilmedi",
+    "attention_unknown_provider": "Bilinmeyen sağlayıcı",
+    "attention_in_minutes": "{{minutes}} dk sonra",
+    "attention_in_hours": "{{hours}} sa sonra",
+    "attention_in_days": "{{days}} gün sonra",
     "hero_verdict_good": "Tüm Sistemler Dengede",
     "hero_verdict_warning": "Küçük Dalgalanma",
     "hero_verdict_critical": "İlgi Gerekiyor",

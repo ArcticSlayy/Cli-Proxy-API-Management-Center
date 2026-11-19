@@ -135,6 +135,14 @@
     "system_info": "Runtime & diagnostics"
   },
   "dashboard": {
+    "attention_heading": "What needs attention",
+    "attention_more": "All credentials",
+    "attention_paused": "Paused",
+    "attention_no_reason": "No reason reported",
+    "attention_unknown_provider": "Unknown provider",
+    "attention_in_minutes": "in {{minutes}}m",
+    "attention_in_hours": "in {{hours}}h",
+    "attention_in_days": "in {{days}}d",
     "hero_verdict_good": "All systems steady",
     "hero_verdict_warning": "Minor turbulence",
     "hero_verdict_critical": "Needs attention",

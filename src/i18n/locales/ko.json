@@ -135,6 +135,14 @@
     "system_info": "런타임 및 진단"
   },
   "dashboard": {
+    "attention_heading": "확인 필요",
+    "attention_more": "모든 자격 증명",
+    "attention_paused": "일시중지됨",
+    "attention_no_reason": "사유 없음",
+    "attention_unknown_provider": "알 수 없는 공급자",
+    "attention_in_minutes": "{{minutes}}분 후",
+    "attention_in_hours": "{{hours}}시간 후",
+    "attention_in_days": "{{days}}일 후",
     "hero_verdict_good": "모든 시스템 정상",
     "hero_verdict_warning": "다소 불안정",
     "hero_verdict_critical": "주의 필요",

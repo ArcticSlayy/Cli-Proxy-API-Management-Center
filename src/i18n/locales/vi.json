@@ -135,6 +135,14 @@
     "system_info": "Runtime & chẩn đoán"
   },
   "dashboard": {
+    "attention_heading": "Cần chú ý",
+    "attention_more": "Tất cả thông tin xác thực",
+    "attention_paused": "Đã tạm dừng",
+    "attention_no_reason": "Không có lý do",
+    "attention_unknown_provider": "Nhà cung cấp không rõ",
+    "attention_in_minutes": "sau {{minutes}} phút",
+    "attention_in_hours": "sau {{hours}} giờ",
+    "attention_in_days": "sau {{days}} ngày",
     "hero_verdict_good": "Mọi hệ thống ổn định",
     "hero_verdict_warning": "Có chút trục trặc nhỏ",
     "hero_verdict_critical": "Cần chú ý",

@@ -18,6 +18,16 @@ Last updated: 2026-11-19
   `http://127.0.0.1:8317/management.html` (3,906,778 bytes). Upstream's downloaded copy is kept
   beside it as `management.html.upstream-20261118`.
 
+## Our changes
+
+| Area | What changed | Why |
+| --- | --- | --- |
+| Dashboard hero | "What needs attention" list: provider, account, unwrapped upstream reason, cooldown remainder, link to Auth Files | The verdict said *Needs attention* but itemised nothing; the failures (quota, rate limit) were only discoverable by opening Auth Files |
+| `useDashboardOverview` | Derives `attention[]` from disabled/unavailable credentials, sorts unavailable first then soonest cooldown, records the snapshot receipt time so render stays pure | Keeps `react-hooks/purity` satisfied and the cooldown math honest |
+| `utils.summarizeCredentialReason` | Unwraps `{error:{message}}` JSON envelopes into one line, collapses whitespace, truncates at 120 chars | Rows showed raw 400-char JSON blobs before |
+| i18n | 8 keys × 7 locales | Locale parity tests require every bundle to carry every key |
+| Tests | `tests/dashboardAttention.test.ts` (5 cases: source contracts, reason unwrapping, locale coverage) | Matches the repo's source-contract + pure-helper test style |
+
 ## Merged upstream fixes (2026-11-19)
 
 | PR | What it fixes |

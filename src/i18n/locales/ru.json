@@ -134,6 +134,14 @@
     "system_info": "Состояние и диагностика"
   },
   "dashboard": {
+    "attention_heading": "Требует внимания",
+    "attention_more": "Все учётные данные",
+    "attention_paused": "Приостановлено",
+    "attention_no_reason": "Причина не указана",
+    "attention_unknown_provider": "Неизвестный провайдер",
+    "attention_in_minutes": "через {{minutes}} мин",
+    "attention_in_hours": "через {{hours}} ч",
+    "attention_in_days": "через {{days}} дн",
     "hero_verdict_good": "Всё стабильно",
     "hero_verdict_warning": "Небольшие сбои",
     "hero_verdict_critical": "Требует внимания",

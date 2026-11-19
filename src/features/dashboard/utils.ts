@@ -44,7 +44,6 @@ export function bucketsToMinutes(bucketCount: number): number {
 }
 
 export type MeterTone = 'good' | 'warning' | 'critical' | 'idle';
-
 /** 成功率 → 严重度。数值本身始终可见，颜色只是辅助通道。 */
 export function toneForSuccessRate(rate: number | null): MeterTone {
   if (rate === null) return 'idle';
@@ -73,4 +72,49 @@ export function axisMax(peak: number, intervals: number): number {
   if (peak <= 0 || intervals <= 0) return Math.max(1, intervals);
   const step = Math.max(1, Math.ceil(niceCeil(peak / intervals)));
   return step * intervals;
+}
+
+/** Collapse whitespace and cut at a word-ish boundary so rows stay one line. */
+const truncateReason = (value: string, maxLength: number): string =>
+  value.length > maxLength ? `${value.slice(0, maxLength - 1).trimEnd()}…` : value;
+
+/**
+ * Auth-file status messages arrive either as a plain sentence or as the raw
+ * JSON body of the upstream error. Show the human sentence, not the envelope.
+ * Anything unparsable is collapsed to one line and truncated.
+ */
+export function summarizeCredentialReason(
+  raw: string | null | undefined,
+  maxLength = 120
+): string | null {
+  const text = String(raw ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return null;
+
+  if (text.startsWith('{') || text.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(text) as {
+        message?: unknown;
+        detail?: unknown;
+        error?: { message?: unknown; error?: { message?: unknown } } | string;
+      };
+      const nested = typeof parsed.error === 'object' && parsed.error ? parsed.error : null;
+      const candidates = [
+        nested?.message,
+        parsed.message,
+        nested?.error?.message,
+        parsed.detail,
+        typeof parsed.error === 'string' ? parsed.error : undefined,
+      ];
+      const message = candidates.find(
+        (candidate): candidate is string => typeof candidate === 'string' && candidate.trim() !== ''
+      );
+      if (message) return truncateReason(message.replace(/\s+/g, ' ').trim(), maxLength);
+    } catch {
+      // Not JSON after all: fall through to the collapsed text.
+    }
+  }
+
+  return truncateReason(text, maxLength);
 }

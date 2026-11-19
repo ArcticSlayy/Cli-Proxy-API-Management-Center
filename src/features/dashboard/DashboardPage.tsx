@@ -12,6 +12,7 @@ import {
 import { InfoTip } from '@/components/ui/Tooltip';
 import { useAuthStore } from '@/stores';
 import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
+import { useNow } from '@/hooks/useNow';
 import { formatCompactNumber, formatDateValue, formatPercent } from '@/utils/format';
 import { useDashboardOverview } from './hooks/useDashboardOverview';
 import { LiveWire } from './components/LiveWire';
@@ -41,7 +42,7 @@ export function DashboardPage() {
   const serverVersion = useAuthStore((state) => state.serverVersion);
   const serverBuildDate = useAuthStore((state) => state.serverBuildDate);
 
-  const { connectionStatus, connected, config, counts, traffic, providers, credentials, refresh } =
+  const { connectionStatus, connected, config, counts, traffic, providers, credentials, attention, refresh } =
     useDashboardOverview();
 
   useHeaderRefresh(refresh, connected);
@@ -55,6 +56,22 @@ export function DashboardPage() {
   const ctaRef = useRevealGroup<HTMLElement>();
 
   const animatedTotal = useCountUp(traffic.total, connected);
+
+  /* Minute clock, only ticked while there is something counting down. */
+  const now = useNow(attention.length > 0);
+
+  /** Cooldown remainder in the largest useful unit, e.g. "resets in 23m". */
+  const remainingLabel = (retryAtMs: number | null): string | null => {
+    if (!retryAtMs) return null;
+    const minutes = Math.max(1, Math.round((retryAtMs - now) / 60_000));
+    if (minutes < 60) return t('dashboard.attention_in_minutes', { minutes });
+    const hours = Math.round(minutes / 60);
+    if (hours < 48) return t('dashboard.attention_in_hours', { hours });
+    return t('dashboard.attention_in_days', { days: Math.round(hours / 24) });
+  };
+
+  const attentionShown = attention.slice(0, 3);
+  const attentionHidden = attention.length - attentionShown.length;
 
   const windowLabel = useMemo(() => {
     if (traffic.windowMinutes <= 0) return DASH;
@@ -244,6 +261,42 @@ export function DashboardPage() {
               </span>
             </Link>
           </div>
+          {connected && attention.length > 0 && (
+            <div className={styles.attention} data-reveal>
+              <span className={styles.attentionHeading}>
+                {t('dashboard.attention_heading')}
+              </span>
+              <ul className={styles.attentionList}>
+                {attentionShown.map((item) => {
+                  const retry = remainingLabel(item.retryAtMs);
+                  const reason = item.disabled
+                    ? t('dashboard.attention_paused')
+                    : (item.reason ?? t('dashboard.attention_no_reason'));
+                  return (
+                    <li key={item.name} className={styles.attentionRow}>
+                      <span className={styles.attentionProvider}>
+                        {providerLabel(item.provider, t('dashboard.attention_unknown_provider'))}
+                      </span>
+                      <span className={styles.attentionLabel} title={item.label}>
+                        {item.label}
+                      </span>
+                      <span className={styles.attentionReason} title={reason}>
+                        {reason}
+                      </span>
+                      <span className={styles.attentionReset}>
+                        {item.disabled ? null : retry}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              {attentionHidden > 0 && (
+                <Link to="/auth-files" className={styles.attentionMore}>
+                  {t('dashboard.attention_more')}
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         <div className={styles.heroPanel} data-reveal="scale">

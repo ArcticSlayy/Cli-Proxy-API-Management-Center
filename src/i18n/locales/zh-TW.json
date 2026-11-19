@@ -135,6 +135,14 @@
     "system_info": "運行與診斷資訊"
   },
   "dashboard": {
+    "attention_heading": "需要注意",
+    "attention_more": "全部憑證",
+    "attention_paused": "已暫停",
+    "attention_no_reason": "未回報原因",
+    "attention_unknown_provider": "未知供應商",
+    "attention_in_minutes": "{{minutes}} 分鐘後",
+    "attention_in_hours": "{{hours}} 小時後",
+    "attention_in_days": "{{days}} 天後",
     "hero_verdict_good": "運行平穩",
     "hero_verdict_warning": "略有波動",
     "hero_verdict_critical": "需要留意",

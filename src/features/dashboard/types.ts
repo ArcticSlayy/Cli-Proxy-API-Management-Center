@@ -41,6 +41,24 @@ export interface CredentialHealth {
 }
 
 /** 顶部计数卡片的原始数值 */
+/**
+ * One credential that needs a human: disabled by the operator, or unavailable
+ * because the upstream rejected it (quota, rate limit, revoked token).
+ */
+export interface CredentialAttention {
+  /** Auth-file name; stable React key. */
+  name: string;
+  /** Email, project ID, or file base name - never an API key. */
+  label: string;
+  /** Provider id used for labelling. */
+  provider: string;
+  disabled: boolean;
+  /** Upstream message, when the credential is unavailable. */
+  reason: string | null;
+  /** Epoch ms when the cooldown ends, when the server reported one. */
+  retryAtMs: number | null;
+}
+
 export interface DashboardCounts {
   managementKeys: number | null;
   providerKeys: number | null;
